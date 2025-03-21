@@ -65,7 +65,7 @@ const App = () => {
         url: "https://openrouter.ai/api/v1/chat/completions",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer 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`,
         },
         body: {
           model: "deepseek/deepseek-r1:free",
