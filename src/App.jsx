@@ -51,7 +51,7 @@ const App = () => {
         url: "https://api.openai.com/v1/chat/completions",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer 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`,
         },
         body: {
           model: model,
