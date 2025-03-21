@@ -51,7 +51,7 @@ const App = () => {
         url: "https://api.openai.com/v1/chat/completions",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
         },
         body: {
           model: model,
@@ -65,7 +65,7 @@ const App = () => {
         url: "https://openrouter.ai/api/v1/chat/completions",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer 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`,
+          Authorization: `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`,
         },
         body: {
           model: "deepseek/deepseek-r1:free",
@@ -74,6 +74,27 @@ const App = () => {
             ...messages,
           ],
           extra_body: {},
+        },
+      },
+      gemini: {
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${
+          import.meta.env.VITE_GEMINI_API_KEY
+        }`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: {
+          contents: [
+            {
+              parts: [
+                {
+                  text: messages
+                    .map((msg) => `${msg.role}: ${msg.content}`)
+                    .join("\n"),
+                },
+              ],
+            },
+          ],
         },
       },
     };
@@ -92,7 +113,10 @@ const App = () => {
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    if (model === "gemini") {
+      return data.candidates[0].content.parts[0].text; // Gemini response format
+    }
+    return data.choices[0].message.content; // OpenAI/DeepSeek response format
   };
 
   const saveChat = (history) => {

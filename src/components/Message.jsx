@@ -1,10 +1,12 @@
 import React from "react";
-import ReactMarkdown from "react-markdown";
+import { marked } from "marked"; // Correct import for marked
 
 const Message = ({ type, content }) => {
+  const htmlContent = marked.parse(content);
+
   return (
     <div className={`message ${type === "user" ? "user" : "ai"}`}>
-      <ReactMarkdown>{content}</ReactMarkdown>
+      <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
     </div>
   );
 };

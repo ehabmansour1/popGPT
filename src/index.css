@@ -351,3 +351,92 @@ textarea:focus {
   border-radius: 12px;
   display: inline-block;
 }
+/* Add this to your App.css */
+.message {
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  max-width: 85%;
+}
+
+.message.user {
+  background-color: rgba(255, 169, 122, 0.15);
+  align-self: flex-end;
+}
+
+.message.ai {
+  background-color: rgba(255, 255, 255, 0.07);
+  align-self: flex-start;
+}
+
+/* Markdown-specific styles */
+.message h1,
+.message h2,
+.message h3,
+.message h4,
+.message h5,
+.message h6 {
+  margin: 1rem 0;
+}
+
+.message p {
+  margin: 0.5rem 0;
+}
+
+.message a {
+  color: var(--main-color);
+  text-decoration: none;
+}
+
+.message a:hover {
+  text-decoration: underline;
+}
+
+.message img {
+  max-width: 100%;
+  border-radius: 8px;
+  margin: 0.5rem 0;
+}
+
+.message ul,
+.message ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.message code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.message pre {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.message blockquote {
+  border-left: 4px solid var(--main-color);
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+.message table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.message th,
+.message td {
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message th {
+  background-color: rgba(255, 255, 255, 0.07);
+}
