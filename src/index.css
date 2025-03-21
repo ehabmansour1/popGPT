@@ -1,0 +1,353 @@
+:root {
+  --main-color: #ffa97a;
+  --back-color: #111a21;
+  --card-bg: rgba(255, 255, 255, 0.07);
+  --hover-bg: rgba(255, 169, 122, 0.15);
+  --text-color: #ffffff;
+  --text-secondary: #9ba4b4;
+  --message-ai-bg: rgba(255, 255, 255, 0.07);
+  --message-user-bg: rgba(255, 169, 122, 0.15);
+  --border-radius: 12px;
+  --transition: all 0.3s ease;
+}
+.model-select option {
+  color: var(--main-color);
+  background-color: var(--back-color);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Plus Jakarta Sans", sans-serif;
+}
+
+body {
+  background-color: var(--back-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.navbar {
+  background: rgba(17, 26, 33, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  color: var(--main-color);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.model-select {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 169, 122, 0.3);
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.model-select:hover {
+  border-color: var(--main-color);
+  background: var(--hover-bg);
+}
+
+.chat-container {
+  display: flex;
+  padding-top: 4rem;
+  height: 100vh;
+}
+
+.chat-sidebar {
+  width: 300px;
+  background: rgba(17, 26, 33, 0.95);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.new-chat-btn {
+  background: var(--main-color);
+  color: var(--back-color);
+  border: none;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  font-weight: 600;
+  transition: var(--transition);
+  font-size: 0.95rem;
+}
+
+.new-chat-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 169, 122, 0.2);
+}
+
+.chat-history {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  overflow-y: auto;
+}
+
+.chat-history-item {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.chat-history-item:hover {
+  background: var(--hover-bg);
+  border-color: rgba(255, 169, 122, 0.3);
+}
+
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  gap: 2rem;
+  background: linear-gradient(
+    to bottom,
+    rgba(17, 26, 33, 0.8),
+    rgba(17, 26, 33, 0.95)
+  );
+}
+
+.message-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.message {
+  max-width: 85%;
+  padding: 1.2rem;
+  border-radius: var(--border-radius);
+  animation: fadeIn 0.3s ease-out;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.message.ai {
+  background: var(--message-ai-bg);
+  align-self: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message.user {
+  background: var(--message-user-bg);
+  align-self: flex-end;
+  border: 1px solid rgba(255, 169, 122, 0.2);
+}
+
+.input-container {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-color);
+  resize: none;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  min-height: 20px;
+  max-height: 200px;
+}
+
+textarea:focus {
+  outline: none;
+}
+
+.send-button {
+  background: var(--main-color);
+  border: none;
+  color: var(--back-color);
+  cursor: pointer;
+  padding: 0.8rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 169, 122, 0.2);
+}
+
+.tab-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.8rem 1.5rem;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.tab.active {
+  background: var(--main-color);
+  color: var(--back-color);
+  border-color: var(--main-color);
+}
+
+.tab:hover:not(.active) {
+  background: var(--hover-bg);
+  border-color: rgba(255, 169, 122, 0.3);
+}
+
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.generated-image {
+  width: 100%;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.generated-image:hover {
+  transform: scale(1.05);
+}
+
+.image-options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.image-option-select {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 169, 122, 0.3);
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.image-option-select:hover {
+  border-color: var(--main-color);
+  background: var(--hover-bg);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-sidebar {
+    display: none;
+  }
+
+  .chat-main {
+    padding: 1rem;
+  }
+
+  .message {
+    max-width: 95%;
+  }
+
+  .input-container {
+    padding: 1rem;
+  }
+}
+/* Add this to your App.css */
+.message h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.message h4 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0.5rem 0;
+}
+
+.message strong {
+  font-weight: 600;
+}
+
+.message em {
+  font-style: italic;
+}
+
+.message br {
+  display: block;
+  content: "";
+  margin: 0.5rem 0;
+}
+.typing-indicator {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-style: italic;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  display: inline-block;
+}
