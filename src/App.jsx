@@ -6,7 +6,7 @@ import Auth from "./components/Auth";
 import { fetchAI, analyzeImage } from "./services/api";
 import { useAuth } from "./contexts/AuthContext";
 import { db } from "./firebase/config";
-import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import "./App.css";
 
 const App = () => {
@@ -54,7 +54,12 @@ const App = () => {
 
     const updatedChats = {
       ...chats,
-      [currentChatId]: { messages: history, preview },
+      [currentChatId]: {
+        messages: history,
+        preview,
+        timestamp: Date.now(),
+        lastUpdated: Date.now(),
+      },
     };
 
     try {
@@ -105,7 +110,12 @@ const App = () => {
         isImage: responseIsImage,
       };
 
-      setConversationHistory((prevHistory) => [...prevHistory, aiMessage]);
+      setConversationHistory((prevHistory) => {
+        const newHistory = [...prevHistory, aiMessage];
+        // Save chat history after each message exchange
+        saveChat(newHistory);
+        return newHistory;
+      });
     } catch (error) {
       console.error("Error:", error);
       const errorMessage = {
@@ -115,7 +125,12 @@ const App = () => {
           "Sorry, there was an error processing your request. Please try again.",
         isImage: false,
       };
-      setConversationHistory((prevHistory) => [...prevHistory, errorMessage]);
+      setConversationHistory((prevHistory) => {
+        const newHistory = [...prevHistory, errorMessage];
+        // Save chat history even if there's an error
+        saveChat(newHistory);
+        return newHistory;
+      });
     } finally {
       setIsLoading(false);
     }
@@ -134,6 +149,8 @@ const App = () => {
         content: newContent,
       };
 
+      // Save chat history after editing
+      saveChat(newHistory);
       return newHistory;
     });
     setEditingMessageId(null);
@@ -160,7 +177,13 @@ const App = () => {
         const messageIndex = prevHistory.findIndex(
           (msg) => msg.id === messageId
         );
-        return [...prevHistory.slice(0, messageIndex + 1), aiMessage];
+        const newHistory = [
+          ...prevHistory.slice(0, messageIndex + 1),
+          aiMessage,
+        ];
+        // Save chat history after AI response
+        saveChat(newHistory);
+        return newHistory;
       });
     } catch (error) {
       console.error("Error:", error);
@@ -175,7 +198,13 @@ const App = () => {
         const messageIndex = prevHistory.findIndex(
           (msg) => msg.id === messageId
         );
-        return [...prevHistory.slice(0, messageIndex + 1), errorMessage];
+        const newHistory = [
+          ...prevHistory.slice(0, messageIndex + 1),
+          errorMessage,
+        ];
+        // Save chat history even if there's an error
+        saveChat(newHistory);
+        return newHistory;
       });
     } finally {
       setIsLoading(false);
@@ -188,7 +217,10 @@ const App = () => {
       for (let i = prevHistory.length - 1; i >= 0; i--) {
         if (prevHistory[i].role === "user") {
           // Remove this message and all subsequent messages
-          return prevHistory.slice(0, i);
+          const newHistory = prevHistory.slice(0, i);
+          // Save chat history after deletion
+          saveChat(newHistory);
+          return newHistory;
         }
       }
       return prevHistory;
@@ -204,14 +236,76 @@ const App = () => {
       saveChat(conversationHistory);
     }
 
-    setCurrentChatId(Date.now());
+    const newChatId = Date.now();
+    setCurrentChatId(newChatId);
     setConversationHistory([]);
+
+    // Initialize the new chat with timestamps
+    const updatedChats = {
+      ...chats,
+      [newChatId]: {
+        messages: [],
+        preview: "New Chat",
+        timestamp: newChatId,
+        lastUpdated: newChatId,
+      },
+    };
+
+    // Update Firestore and local state
+    if (user) {
+      const userDocRef = doc(db, "users", user.uid);
+      updateDoc(userDocRef, { chats: updatedChats })
+        .then(() => {
+          setChats(updatedChats);
+        })
+        .catch((error) => {
+          console.error("Error creating new chat:", error);
+        });
+    }
   };
 
   const loadChat = (chatId) => {
     if (chats[chatId]) {
       setCurrentChatId(chatId);
       setConversationHistory(chats[chatId].messages);
+    }
+  };
+
+  const handleDeleteChat = async (chatId) => {
+    const updatedChats = { ...chats };
+    delete updatedChats[chatId];
+
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, { chats: updatedChats });
+      setChats(updatedChats);
+
+      // If the deleted chat was the current chat, clear the conversation
+      if (chatId === currentChatId) {
+        setCurrentChatId(Date.now());
+        setConversationHistory([]);
+      }
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+    }
+  };
+
+  const handleRenameChat = async (chatId, newName) => {
+    const updatedChats = { ...chats };
+    if (updatedChats[chatId]) {
+      updatedChats[chatId] = {
+        ...updatedChats[chatId],
+        preview: newName,
+        lastUpdated: Date.now(),
+      };
+
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        await updateDoc(userDocRef, { chats: updatedChats });
+        setChats(updatedChats);
+      } catch (error) {
+        console.error("Error renaming chat:", error);
+      }
     }
   };
 
@@ -231,6 +325,8 @@ const App = () => {
           chats={chats}
           onCreateNewChat={createNewChat}
           onLoadChat={loadChat}
+          onDeleteChat={handleDeleteChat}
+          onRenameChat={handleRenameChat}
         />
         <ChatMain
           conversationHistory={conversationHistory}
