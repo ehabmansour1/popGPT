@@ -11,6 +11,7 @@ const App = () => {
   const [chats, setChats] = useState({});
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
   const [isLoading, setIsLoading] = useState(false);
+  const [editingMessageId, setEditingMessageId] = useState(null);
 
   // Load chat history from localStorage on mount
   useEffect(() => {
@@ -26,15 +27,28 @@ const App = () => {
   const handleSendMessage = async (message, isImage = false) => {
     if (!message.trim() && !isImage) return;
 
-    const newMessage = { role: "user", content: message, isImage };
+    const newMessage = {
+      id: Date.now(),
+      role: "user",
+      content: message,
+      isImage,
+    };
     setConversationHistory((prevHistory) => [...prevHistory, newMessage]);
 
     setIsLoading(true);
 
     try {
       let response;
+      let responseIsImage = false;
+
       if (isImage) {
         response = await analyzeImage(message);
+      } else if (selectedModel === "image-gen") {
+        response = await fetchAI(selectedModel, [
+          ...conversationHistory,
+          newMessage,
+        ]);
+        responseIsImage = true;
       } else {
         response = await fetchAI(selectedModel, [
           ...conversationHistory,
@@ -43,15 +57,17 @@ const App = () => {
       }
 
       const aiMessage = {
+        id: Date.now() + 1,
         role: "assistant",
         content: response,
-        isImage: false,
+        isImage: responseIsImage,
       };
 
       setConversationHistory((prevHistory) => [...prevHistory, aiMessage]);
     } catch (error) {
       console.error("Error:", error);
       const errorMessage = {
+        id: Date.now() + 1,
         role: "assistant",
         content:
           "Sorry, there was an error processing your request. Please try again.",
@@ -61,6 +77,84 @@ const App = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEditMessage = async (messageId, newContent) => {
+    setConversationHistory((prevHistory) => {
+      const messageIndex = prevHistory.findIndex((msg) => msg.id === messageId);
+      if (messageIndex === -1 || prevHistory[messageIndex].role !== "user")
+        return prevHistory;
+
+      // Create new array with edited message
+      const newHistory = [...prevHistory.slice(0, messageIndex + 1)];
+      newHistory[messageIndex] = {
+        ...newHistory[messageIndex],
+        content: newContent,
+      };
+
+      return newHistory;
+    });
+    setEditingMessageId(null);
+
+    // Generate new response after editing
+    setIsLoading(true);
+    try {
+      const response = await fetchAI(selectedModel, [
+        ...conversationHistory.slice(
+          0,
+          conversationHistory.findIndex((msg) => msg.id === messageId)
+        ),
+        { role: "user", content: newContent },
+      ]);
+
+      const aiMessage = {
+        id: Date.now(),
+        role: "assistant",
+        content: response,
+        isImage: false,
+      };
+
+      setConversationHistory((prevHistory) => {
+        const messageIndex = prevHistory.findIndex(
+          (msg) => msg.id === messageId
+        );
+        return [...prevHistory.slice(0, messageIndex + 1), aiMessage];
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      const errorMessage = {
+        id: Date.now(),
+        role: "assistant",
+        content:
+          "Sorry, there was an error processing your request. Please try again.",
+        isImage: false,
+      };
+      setConversationHistory((prevHistory) => {
+        const messageIndex = prevHistory.findIndex(
+          (msg) => msg.id === messageId
+        );
+        return [...prevHistory.slice(0, messageIndex + 1), errorMessage];
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteLastPrompt = () => {
+    setConversationHistory((prevHistory) => {
+      // Find the last user message
+      for (let i = prevHistory.length - 1; i >= 0; i--) {
+        if (prevHistory[i].role === "user") {
+          // Remove this message and all subsequent messages
+          return prevHistory.slice(0, i);
+        }
+      }
+      return prevHistory;
+    });
+  };
+
+  const startEditing = (messageId) => {
+    setEditingMessageId(messageId);
   };
 
   const saveChat = (history) => {
@@ -109,7 +203,12 @@ const App = () => {
         <ChatMain
           conversationHistory={conversationHistory}
           onSendMessage={handleSendMessage}
+          onEditMessage={handleEditMessage}
+          onDeleteLastPrompt={handleDeleteLastPrompt}
+          startEditing={startEditing}
+          editingMessageId={editingMessageId}
           isLoading={isLoading}
+          selectedModel={selectedModel}
         />
       </div>
     </div>

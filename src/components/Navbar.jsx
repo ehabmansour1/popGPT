@@ -12,6 +12,7 @@ const Navbar = ({ selectedModel, setSelectedModel }) => {
         <option value="gpt-4o-mini">GPT-4o-mini</option>
         <option value="deepseek">DeepSeek</option>
         <option value="gemini">Gemini</option>
+        <option value="image-gen">Image Generator</option>
       </select>
     </nav>
   );

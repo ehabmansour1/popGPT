@@ -33,7 +33,7 @@ const getHeaders = (model) => {
   return headers;
 };
 
-const getRequestBody = (model, messages, isImage = false) => {
+const getRequestBody = (model, messages, isImage = false, stream = false) => {
   let formattedMessages;
 
   switch (model) {
@@ -46,6 +46,7 @@ const getRequestBody = (model, messages, isImage = false) => {
         ],
         temperature: 0.7,
         max_tokens: 1000,
+        stream,
       };
 
     case "deepseek":
@@ -55,6 +56,7 @@ const getRequestBody = (model, messages, isImage = false) => {
           { role: "system", content: "You are a helpful assistant." },
           ...messages,
         ],
+        stream,
         extra_body: {},
       };
 
@@ -101,7 +103,88 @@ const getRequestBody = (model, messages, isImage = false) => {
   }
 };
 
+export const fetchAIStream = async (
+  model,
+  messages,
+  onChunk,
+  isImage = false
+) => {
+  const endpoint = API_ENDPOINTS[model];
+  if (!endpoint) {
+    throw new Error(`No endpoint found for model: ${model}`);
+  }
+
+  if (model === "image-gen" || isImage) {
+    // For image generation and analysis, use non-streaming version
+    const response = await fetchAI(model, messages, isImage);
+    onChunk(response);
+    return;
+  }
+
+  const headers = getHeaders(model);
+  const body = getRequestBody(model, messages, isImage, true);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `API request failed with status ${response.status}: ${
+          errorData.error?.message || "Unknown error"
+        }`
+      );
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        if (line.trim() === "") continue;
+        if (line.trim() === "data: [DONE]") continue;
+
+        try {
+          const data = JSON.parse(line.replace(/^data: /, ""));
+          if (model === "gemini") {
+            if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+              onChunk(data.candidates[0].content.parts[0].text);
+            }
+          } else {
+            const content = data.choices?.[0]?.delta?.content;
+            if (content) onChunk(content);
+          }
+        } catch (e) {
+          console.warn("Error parsing streaming response:", e);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`Error in ${model} API stream:`, error);
+    throw error;
+  }
+};
+
 export const fetchAI = async (model, messages, isImage = false) => {
+  if (model === "image-gen") {
+    const encodedPrompt = encodeURIComponent(
+      messages[messages.length - 1].content
+    );
+    return `https://image.pollinations.ai/prompt/${encodedPrompt}`;
+  }
+
   const endpoint = API_ENDPOINTS[model];
   if (!endpoint) {
     throw new Error(`No endpoint found for model: ${model}`);
