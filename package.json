@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google-cloud/vision": "^5.1.0",
     "dompurify": "^3.2.4",
     "marked": "^15.0.7",
     "react": "^19.0.0",
