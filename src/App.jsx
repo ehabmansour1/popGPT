@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import ChatSidebar from "./components/ChatSidebar";
 import ChatMain from "./components/ChatMain";
+import { fetchAI, analyzeImage } from "./services/api";
 import "./App.css";
 
 const App = () => {
@@ -9,7 +10,7 @@ const App = () => {
   const [currentChatId, setCurrentChatId] = useState(Date.now());
   const [chats, setChats] = useState({});
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load chat history from localStorage on mount
   useEffect(() => {
@@ -22,101 +23,44 @@ const App = () => {
     localStorage.setItem("chats", JSON.stringify(chats));
   }, [chats]);
 
-  const handleSendMessage = async (message) => {
-    if (!message.trim()) return;
+  const handleSendMessage = async (message, isImage = false) => {
+    if (!message.trim() && !isImage) return;
 
-    const newMessage = { role: "user", content: message };
-    const updatedHistory = [...conversationHistory, newMessage].slice(-10);
+    const newMessage = { role: "user", content: message, isImage };
+    setConversationHistory((prevHistory) => [...prevHistory, newMessage]);
 
-    setConversationHistory(updatedHistory);
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
-      const response = await fetchAI(selectedModel, updatedHistory);
-      const aiMessage = { role: "assistant", content: response };
+      let response;
+      if (isImage) {
+        response = await analyzeImage(message);
+      } else {
+        response = await fetchAI(selectedModel, [
+          ...conversationHistory,
+          newMessage,
+        ]);
+      }
 
-      setConversationHistory([...updatedHistory, aiMessage]);
-      saveChat([...updatedHistory, aiMessage]);
+      const aiMessage = {
+        role: "assistant",
+        content: response,
+        isImage: false,
+      };
+
+      setConversationHistory((prevHistory) => [...prevHistory, aiMessage]);
     } catch (error) {
       console.error("Error:", error);
+      const errorMessage = {
+        role: "assistant",
+        content:
+          "Sorry, there was an error processing your request. Please try again.",
+        isImage: false,
+      };
+      setConversationHistory((prevHistory) => [...prevHistory, errorMessage]);
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
-  };
-
-  const fetchAI = async (model, messages) => {
-    // Define the request data for each model
-    const requestData = {
-      "gpt-4o-mini": {
-        url: "https://api.openai.com/v1/chat/completions",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-        },
-        body: {
-          model: model,
-          messages: [
-            { role: "system", content: "You are a helpful assistant." },
-            ...messages,
-          ],
-        },
-      },
-      deepseek: {
-        url: "https://openrouter.ai/api/v1/chat/completions",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`,
-        },
-        body: {
-          model: "deepseek/deepseek-r1:free",
-          messages: [
-            { role: "system", content: "You are a helpful assistant." },
-            ...messages,
-          ],
-          extra_body: {},
-        },
-      },
-      gemini: {
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${
-          import.meta.env.VITE_GEMINI_API_KEY
-        }`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: {
-          contents: [
-            {
-              parts: [
-                {
-                  text: messages
-                    .map((msg) => `${msg.role}: ${msg.content}`)
-                    .join("\n"),
-                },
-              ],
-            },
-          ],
-        },
-      },
-    };
-
-    // Get the request data based on the selected model
-    const { url, headers, body } = requestData[model];
-
-    const response = await fetch(url, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-
-    const data = await response.json();
-    if (model === "gemini") {
-      return data.candidates[0].content.parts[0].text; // Gemini response format
-    }
-    return data.choices[0].message.content; // OpenAI/DeepSeek response format
   };
 
   const saveChat = (history) => {
@@ -165,7 +109,7 @@ const App = () => {
         <ChatMain
           conversationHistory={conversationHistory}
           onSendMessage={handleSendMessage}
-          isLoading={isLoading} // Pass loading state to ChatMain
+          isLoading={isLoading}
         />
       </div>
     </div>

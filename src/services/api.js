@@ -1,0 +1,165 @@
+import { analyzeImage as analyzeImageWithVision } from "../utils/visionAPI";
+
+const API_ENDPOINTS = {
+  "gpt-4o-mini": "https://api.openai.com/v1/chat/completions",
+  deepseek: "https://openrouter.ai/api/v1/chat/completions",
+  gemini: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${
+    import.meta.env.VITE_GEMINI_API_KEY
+  }`,
+  "gemini-vision": "https://openrouter.ai/api/v1/chat/completions",
+};
+
+const getHeaders = (model) => {
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  switch (model) {
+    case "gpt-4o-mini":
+      headers.Authorization = `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`;
+      break;
+    case "deepseek":
+      headers.Authorization = `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`;
+      break;
+    case "gemini-vision":
+      headers.Authorization = `Bearer ${
+        import.meta.env.VITE_OPENROUTER_API_KEY
+      }`;
+      break;
+    default:
+      break;
+  }
+
+  return headers;
+};
+
+const getRequestBody = (model, messages, isImage = false) => {
+  let formattedMessages;
+
+  switch (model) {
+    case "gpt-4o-mini":
+      return {
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          ...messages,
+        ],
+        temperature: 0.7,
+        max_tokens: 1000,
+      };
+
+    case "deepseek":
+      return {
+        model: "deepseek/deepseek-r1:free",
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          ...messages,
+        ],
+        extra_body: {},
+      };
+
+    case "gemini":
+      formattedMessages = messages.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.content }],
+      }));
+
+      return {
+        contents: formattedMessages,
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        },
+      };
+
+    case "gemini-vision":
+      return {
+        model: "google/gemini-2.0-flash-thinking-exp-1219:free",
+        messages: [
+          {
+            role: "user",
+            content: isImage
+              ? [
+                  { type: "text", text: "What is in this image?" },
+                  {
+                    type: "image_url",
+                    image_url: { url: messages[0].content },
+                  },
+                ]
+              : messages.map((msg) => ({
+                  type: "text",
+                  text: msg.content,
+                })),
+          },
+        ],
+      };
+
+    default:
+      throw new Error(`Unsupported model: ${model}`);
+  }
+};
+
+export const fetchAI = async (model, messages, isImage = false) => {
+  const endpoint = API_ENDPOINTS[model];
+  if (!endpoint) {
+    throw new Error(`No endpoint found for model: ${model}`);
+  }
+
+  const headers = getHeaders(model);
+  const body = getRequestBody(model, messages, isImage);
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        `API request failed with status ${response.status}: ${
+          errorData.error?.message || "Unknown error"
+        }`
+      );
+    }
+
+    const data = await response.json();
+
+    if (model === "gemini") {
+      if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
+      }
+      throw new Error("Invalid Gemini response format");
+    }
+
+    if (data.choices?.[0]?.message?.content) {
+      return data.choices[0].message.content;
+    }
+    throw new Error("Invalid response format");
+  } catch (error) {
+    console.error(`Error in ${model} API call:`, error);
+    throw error;
+  }
+};
+
+export const analyzeImage = async (imageData) => {
+  try {
+    // First try with Gemini Vision API
+    const response = await fetchAI(
+      "gemini-vision",
+      [{ role: "user", content: imageData }],
+      true
+    );
+    return response;
+  } catch (error) {
+    console.error(
+      "Gemini Vision API failed, falling back to Google Cloud Vision:",
+      error
+    );
+    // Fallback to Google Cloud Vision API
+    return await analyzeImageWithVision(imageData);
+  }
+};

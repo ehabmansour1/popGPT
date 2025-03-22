@@ -32,20 +32,50 @@ body {
   background: rgba(17, 26, 33, 0.8);
   backdrop-filter: blur(20px);
   padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   position: fixed;
   width: 100%;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.navbar-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   color: var(--main-color);
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.5px;
+}
+
+.logo-icon {
+  font-size: 1.8rem;
+}
+
+.logo-text {
+  background: linear-gradient(45deg, var(--main-color), #ff8a5c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.model-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.model-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .model-select {
@@ -57,11 +87,24 @@ body {
   cursor: pointer;
   font-size: 0.9rem;
   transition: var(--transition);
+  min-width: 150px;
 }
 
 .model-select:hover {
   border-color: var(--main-color);
   background: var(--hover-bg);
+}
+
+.model-select:focus {
+  outline: none;
+  border-color: var(--main-color);
+  box-shadow: 0 0 0 2px rgba(255, 169, 122, 0.2);
+}
+
+.model-select option {
+  background-color: var(--back-color);
+  color: var(--text-color);
+  padding: 0.5rem;
 }
 
 .chat-container {
@@ -416,8 +459,13 @@ textarea:focus {
   padding: 1rem;
   border-radius: 8px;
   overflow-x: auto;
+  width: 600px;
+  max-width: 100%;
 }
-
+img {
+  width: 300px;
+  max-width: 100%;
+}
 .message blockquote {
   border-left: 4px solid var(--main-color);
   padding-left: 1rem;
@@ -439,4 +487,110 @@ textarea:focus {
 
 .message th {
   background-color: rgba(255, 255, 255, 0.07);
+}
+.navbar {
+  background: rgba(17, 26, 33, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.model-select {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 169, 122, 0.3);
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.model-select:hover {
+  border-color: var(--main-color);
+  background: var(--hover-bg);
+}
+
+.image-mode-button {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 169, 122, 0.3);
+  color: var(--text-color);
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.image-mode-button:hover {
+  border-color: var(--main-color);
+  background: var(--hover-bg);
+}
+
+.image-mode-button.active {
+  background: var(--main-color);
+  color: var(--back-color);
+  border-color: var(--main-color);
+}
+.navbar {
+  background: rgba(17, 26, 33, 0.8);
+  backdrop-filter: blur(20px);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.image-mode-button {
+  background: var(--main-color);
+  border: none;
+  color: var(--back-color);
+  padding: 0.6rem 1rem;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.image-mode-button:hover {
+  background: var(--hover-bg);
+}
+
+.upload-button {
+  background: var(--main-color);
+  border: none;
+  color: var(--back-color);
+  cursor: pointer;
+  padding: 0.8rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 169, 122, 0.2);
 }
