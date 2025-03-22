@@ -32,7 +32,7 @@ body {
   background: rgba(17, 26, 33, 0.8);
   backdrop-filter: blur(20px);
   padding: 1rem 2rem;
-  position: fixed;
+
   width: 100%;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -109,8 +109,7 @@ body {
 
 .chat-container {
   display: flex;
-  padding-top: 4rem;
-  height: 100vh;
+  height: calc(100vh - 74.19px);
 }
 
 .chat-sidebar {
@@ -188,12 +187,14 @@ body {
 }
 
 .message {
+  position: relative;
   max-width: 85%;
   padding: 1.2rem;
   border-radius: var(--border-radius);
   animation: fadeIn 0.3s ease-out;
   line-height: 1.7;
   font-size: 0.95rem;
+  margin-bottom: 1rem;
 }
 
 .message.ai {
@@ -206,6 +207,199 @@ body {
   background: var(--message-user-bg);
   align-self: flex-end;
   border: 1px solid rgba(255, 169, 122, 0.2);
+}
+
+.message-content {
+  position: relative;
+}
+
+.message-actions {
+  position: absolute;
+  top: 286%;
+  right: -17px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+  transform: translateY(-50%);
+}
+
+.action-button {
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  background: var(--hover-bg);
+  color: var(--main-color);
+  border-color: var(--main-color);
+  transform: translateY(-2px);
+}
+
+.action-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Message editing styles */
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.edit-textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid var(--main-color);
+  border-radius: var(--border-radius);
+  background: var(--card-bg);
+  color: var(--text-color);
+  font-family: inherit;
+  font-size: inherit;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.edit-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 169, 122, 0.2);
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.save-button,
+.cancel-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.save-button {
+  background: var(--main-color);
+  color: var(--back-color);
+}
+
+.save-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(255, 169, 122, 0.3);
+}
+
+.cancel-button {
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cancel-button:hover {
+  background: var(--hover-bg);
+  border-color: var(--main-color);
+}
+
+/* Message markdown styles */
+.message h1,
+.message h2,
+.message h3,
+.message h4,
+.message h5,
+.message h6 {
+  margin: 1rem 0;
+  color: var(--main-color);
+}
+
+.message p {
+  margin: 0.5rem 0;
+}
+
+.message a {
+  color: var(--main-color);
+  text-decoration: none;
+}
+
+.message a:hover {
+  text-decoration: underline;
+}
+
+.message img {
+  max-width: 100%;
+  border-radius: var(--border-radius);
+  margin: 0.5rem 0;
+}
+
+.message code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Fira Code", monospace;
+  font-size: 0.9em;
+}
+
+.message pre {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.message pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  display: block;
+}
+
+.message ul,
+.message ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.message blockquote {
+  border-left: 4px solid var(--main-color);
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+.message table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.5rem 0;
+}
+
+.message th,
+.message td {
+  padding: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.message th {
+  background-color: rgba(255, 255, 255, 0.07);
 }
 
 .input-container {
@@ -495,7 +689,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
+
   width: 100%;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -551,7 +745,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
+
   width: 100%;
   z-index: 1000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -598,86 +792,6 @@ img {
   position: relative;
 }
 
-.message-actions {
-  position: absolute;
-  top: 10px;
-  left: -30px;
-  display: none;
-  gap: 8px;
-  flex-direction: column;
-}
-
-.message-content:hover .message-actions {
-  display: flex;
-}
-
-.edit-button,
-.delete-button {
-  background: none;
-  border: none;
-  padding: 4px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  border-radius: 4px;
-}
-
-.edit-button:hover,
-.delete-button:hover {
-  opacity: 1;
-  background: var(--card-bg);
-}
-
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.edit-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 8px;
-  border: 1px solid var(--main-color);
-  border-radius: 4px;
-  background: var(--card-bg);
-  color: var(--text-color);
-  font-family: inherit;
-  font-size: inherit;
-  resize: vertical;
-}
-
-.edit-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.save-button,
-.cancel-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
-
-.save-button {
-  background: var(--main-color);
-  color: var(--back-color);
-}
-
-.cancel-button {
-  background: var(--card-bg);
-  color: var(--text-color);
-}
-
-.save-button:hover,
-.cancel-button:hover {
-  transform: translateY(-1px);
-}
 .signup-container {
   display: flex;
   justify-content: center;

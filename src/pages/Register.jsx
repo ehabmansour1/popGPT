@@ -1,25 +1,28 @@
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
-const Register = ({ onToggleAuth }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+const Register = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (password !== confirmPassword) {
-      return setError('Passwords do not match');
+      return setError("Passwords do not match");
     }
 
     setLoading(true);
     try {
       await signup(email, password);
+      navigate("/chat");
     } catch (err) {
       setError(err.message);
     }
@@ -62,14 +65,14 @@ const Register = ({ onToggleAuth }) => {
           />
         </div>
         <button type="submit" disabled={loading} className="auth-button">
-          {loading ? 'Creating Account...' : 'Register'}
+          {loading ? "Creating Account..." : "Register"}
         </button>
       </form>
       <p className="auth-toggle">
-        Already have an account?{' '}
-        <button onClick={onToggleAuth} className="toggle-button">
+        Already have an account?{" "}
+        <Link to="/login" className="toggle-button">
           Login
-        </button>
+        </Link>
       </p>
       <style jsx>{`
         .auth-container {

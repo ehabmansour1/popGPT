@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { Link } from "react-router-dom";
 
 const Navbar = ({ selectedModel, setSelectedModel }) => {
   const { user, logout } = useAuth();
@@ -14,7 +15,9 @@ const Navbar = ({ selectedModel, setSelectedModel }) => {
 
   return (
     <nav className="navbar">
-      <div className="logo">POPGPT</div>
+      <Link to="/" className="logo">
+        PopGPT
+      </Link>
       <div className="controls">
         <select
           className="model-select"
