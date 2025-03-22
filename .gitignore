@@ -1,6 +1,41 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+/dist
+/build
+/out
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
 # Logs
 logs
 *.log
+
+# Testing
+/coverage
+
+# Cache directories
+.cache/
+.next/
+.nuxt/
+.tmp/
+
+# System Files
+Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
