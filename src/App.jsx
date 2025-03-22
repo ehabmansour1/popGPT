@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import ChatSidebar from "./components/ChatSidebar";
 import ChatMain from "./components/ChatMain";
+import Auth from "./components/Auth";
 import { fetchAI, analyzeImage } from "./services/api";
+import { useAuth } from "./contexts/AuthContext";
+import { db } from "./firebase/config";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import "./App.css";
 
 const App = () => {
@@ -12,17 +16,55 @@ const App = () => {
   const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
   const [isLoading, setIsLoading] = useState(false);
   const [editingMessageId, setEditingMessageId] = useState(null);
+  const { user } = useAuth();
 
-  // Load chat history from localStorage on mount
+  // Load chat history from Firestore on mount and when user changes
   useEffect(() => {
-    const savedChats = JSON.parse(localStorage.getItem("chats")) || {};
-    setChats(savedChats);
-  }, []);
+    const loadUserChats = async () => {
+      if (!user) {
+        setChats({});
+        return;
+      }
 
-  // Save chat history to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem("chats", JSON.stringify(chats));
-  }, [chats]);
+      try {
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          setChats(userDoc.data().chats || {});
+        } else {
+          // Create new user document if it doesn't exist
+          await setDoc(userDocRef, { chats: {} });
+          setChats({});
+        }
+      } catch (error) {
+        console.error("Error loading chats:", error);
+      }
+    };
+
+    loadUserChats();
+  }, [user]);
+
+  const saveChat = async (history) => {
+    if (!user || history.length === 0) return;
+
+    const firstMessage = history[0].content;
+    const preview =
+      firstMessage.slice(0, 30) + (firstMessage.length > 30 ? "..." : "");
+
+    const updatedChats = {
+      ...chats,
+      [currentChatId]: { messages: history, preview },
+    };
+
+    try {
+      const userDocRef = doc(db, "users", user.uid);
+      await updateDoc(userDocRef, { chats: updatedChats });
+      setChats(updatedChats);
+    } catch (error) {
+      console.error("Error saving chat:", error);
+    }
+  };
 
   const handleSendMessage = async (message, isImage = false) => {
     if (!message.trim() && !isImage) return;
@@ -157,21 +199,6 @@ const App = () => {
     setEditingMessageId(messageId);
   };
 
-  const saveChat = (history) => {
-    if (history.length === 0) return;
-
-    const firstMessage = history[0].content;
-    const preview =
-      firstMessage.slice(0, 30) + (firstMessage.length > 30 ? "..." : "");
-
-    const updatedChats = {
-      ...chats,
-      [currentChatId]: { messages: history, preview },
-    };
-
-    setChats(updatedChats);
-  };
-
   const createNewChat = () => {
     if (conversationHistory.length > 0) {
       saveChat(conversationHistory);
@@ -188,11 +215,16 @@ const App = () => {
     }
   };
 
+  if (!user) {
+    return <Auth />;
+  }
+
   return (
     <div className="App">
       <Navbar
         selectedModel={selectedModel}
         setSelectedModel={setSelectedModel}
+        user={user}
       />
       <div className="chat-container">
         <ChatSidebar
