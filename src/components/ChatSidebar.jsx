@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AlertDialog from "./AlertDialog";
 
 const ChatSidebar = ({
   chats,
@@ -9,6 +10,10 @@ const ChatSidebar = ({
 }) => {
   const [editingChatId, setEditingChatId] = useState(null);
   const [newChatName, setNewChatName] = useState("");
+  const [deleteDialog, setDeleteDialog] = useState({
+    isOpen: false,
+    chatId: null,
+  });
 
   const handleRename = (chatId, currentPreview) => {
     if (editingChatId === chatId) {
@@ -19,6 +24,21 @@ const ChatSidebar = ({
       setEditingChatId(chatId);
       setNewChatName(currentPreview);
     }
+  };
+
+  const handleDeleteClick = (chatId) => {
+    setDeleteDialog({ isOpen: true, chatId });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteDialog.chatId) {
+      onDeleteChat(deleteDialog.chatId);
+    }
+    setDeleteDialog({ isOpen: false, chatId: null });
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialog({ isOpen: false, chatId: null });
   };
 
   const formatDate = (timestamp) => {
@@ -124,11 +144,7 @@ const ChatSidebar = ({
                 className="action-btn delete-btn"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (
-                    window.confirm("Are you sure you want to delete this chat?")
-                  ) {
-                    onDeleteChat(chat.id);
-                  }
+                  handleDeleteClick(chat.id);
                 }}
                 title="Delete"
               >
@@ -148,6 +164,15 @@ const ChatSidebar = ({
           </div>
         ))}
       </div>
+
+      <AlertDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Chat"
+        message="Are you sure you want to delete this chat? This action cannot be undone."
+      />
+
       <style jsx>{`
         .chat-history-item {
           display: flex;
