@@ -14,7 +14,7 @@ const Navbar = ({ selectedModel, setSelectedModel }) => {
 
   return (
     <nav className="navbar">
-      <div className="logo">POP Assistant</div>
+      <div className="logo">POPGPT</div>
       <div className="controls">
         <select
           className="model-select"
