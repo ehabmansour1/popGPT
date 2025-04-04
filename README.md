@@ -1,5 +1,57 @@
 # PopGPT - AI Model Interaction Platform
 
+## ✨ Features
+
+### 🤖 AI Models
+
+- **GPT-4o-mini**: Advanced language model for natural conversations
+- **DeepSeek**: Specialized model for detailed responses
+- **Gemini**: Google's powerful language model
+- **Image Generator**: Create AI-generated images from text descriptions
+- **Reminder Agent**: Smart task management and scheduling assistant
+- **Gemini Vision**: Advanced image analysis and understanding model
+
+### 💬 Chat Features
+
+- Real-time chat interface with multiple AI models
+- Message editing and deletion capabilities
+- Markdown support for formatted messages
+- Code syntax highlighting
+- Image upload and analysis
+- PDF file support
+- Chat history management
+- Multiple conversation threads
+- Chat renaming and organization
+- Image viewing and preview capabilities
+- Support for AI-generated images
+- Image analysis with vision models
+- Responsive image display with proper scaling
+
+### ⏰ Reminder Agent Capabilities
+
+- Natural language reminder setting
+- Task scheduling and management
+- Recurring reminders
+- In-chat notifications
+- Context-aware reminder processing
+
+### 🔒 Security & User Management
+
+- User authentication
+- Secure API key management
+- Firebase integration for data persistence
+- Protected routes and secure access
+
+### 🎨 UI/UX Features
+
+- Modern, responsive design
+- Dark theme with customizable colors
+- Smooth animations and transitions
+- Mobile-friendly interface
+- Real-time typing indicators
+- File upload with preview
+- Alert dialogs for important actions
+
 ## ⚠️ Important: Environment Variables Setup
 
 Before running this project, you need to create a `.env` file in the root directory with the following API keys:
