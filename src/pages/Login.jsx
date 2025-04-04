@@ -130,6 +130,7 @@ const Login = () => {
 
         .error-message {
           background: rgba(255, 0, 0, 0.1);
+          background: rgba(255, 0, 0, 0.1);
           border: 1px solid rgba(255, 0, 0, 0.3);
           color: #ff6b6b;
           padding: 0.75rem;
