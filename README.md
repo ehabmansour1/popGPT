@@ -74,18 +74,6 @@ To obtain these API keys:
 
 PopGPT is a modern web application built with React and Vite that allows users to interact with multiple AI models through a unified interface. The application provides a seamless experience for users to communicate with different AI models and compare their responses.
 
-## ⏰ Reminder Agent Feature
-
-The application includes a smart reminder agent that can help users manage their tasks and schedule reminders. The agent can:
-
-- Set reminders for specific tasks or events
-- Schedule recurring reminders
-- Send notifications through the chat interface
-- Handle natural language input for setting reminders
-- Integrate with the existing chat system for seamless interaction
-
-The reminder agent uses the chat interface to communicate with users, making it feel like a natural part of the conversation. When a reminder is due, it appears as a message in the chat, maintaining the context of the conversation.
-
 ## 🛠️ Tech Stack
 
 - **Frontend Framework**: React
@@ -98,68 +86,5 @@ The reminder agent uses the chat interface to communicate with users, making it 
 ## 📁 Project Structure
 
 ```
-src/
-├── assets/         # Static assets like images
-├── components/     # Reusable UI components
-├── contexts/       # React context providers
-├── firebase/       # Firebase configuration and utilities
-├── pages/         # Application pages/routes
-├── services/      # API and external service integrations
-├── styles/        # Global styles and theme
-├── utils/         # Helper functions and utilities
-├── App.jsx        # Main application component
-└── main.jsx       # Application entry point
+
 ```
-
-## 🚀 Getting Started
-
-1. Clone the repository:
-
-   ```bash
-   git clone https://github.com/ehabmansour1/popGPT
-   ```
-
-2. Install dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Set up environment variables:
-
-   - Create a `.env` file in the root directory
-   - Add the required API keys as shown in the Environment Variables section
-
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-## 📦 Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview production build
-
-## 🔒 Security Considerations
-
-- Never commit your `.env` file to version control
-- Keep your API keys secure and rotate them regularly
-- Follow security best practices when handling user data
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 👥 Support
-
-For support, please open an issue in the repository or contact the maintainers.
