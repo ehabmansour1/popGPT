@@ -40,6 +40,34 @@ const Chat = () => {
     loadUserChats();
   }, [user]);
 
+  useEffect(() => {
+    // Add event listener for reminder notifications
+    const handleReminderNotification = (event) => {
+      const { message } = event.detail;
+      const aiMessage = {
+        id: Date.now(),
+        role: "assistant",
+        content: message,
+        isImage: false,
+      };
+      setConversationHistory((prevHistory) => {
+        const newHistory = [...prevHistory, aiMessage];
+        saveChat(newHistory);
+        return newHistory;
+      });
+    };
+
+    window.addEventListener("reminderNotification", handleReminderNotification);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener(
+        "reminderNotification",
+        handleReminderNotification
+      );
+    };
+  }, []);
+
   const saveChat = async (history) => {
     if (!user || history.length === 0) return;
 
@@ -305,6 +333,7 @@ const Chat = () => {
           onLoadChat={loadChat}
           onDeleteChat={handleDeleteChat}
           onRenameChat={handleRenameChat}
+          currentChatId={currentChatId}
         />
         <ChatMain
           conversationHistory={conversationHistory}

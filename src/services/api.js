@@ -1,4 +1,5 @@
 import { analyzeImage as analyzeImageWithVision } from "../utils/visionAPI";
+import reminderAgent from "./reminderAgent";
 
 const API_ENDPOINTS = {
   "gpt-4o-mini": "https://api.openai.com/v1/chat/completions",
@@ -7,6 +8,7 @@ const API_ENDPOINTS = {
     import.meta.env.VITE_GEMINI_API_KEY
   }`,
   "gemini-vision": "https://openrouter.ai/api/v1/chat/completions",
+  "reminder-agent": "local", // Local reminder agent
 };
 
 const getHeaders = (model) => {
@@ -35,8 +37,17 @@ const getHeaders = (model) => {
 
 const getRequestBody = (model, messages, isImage = false, stream = false) => {
   let formattedMessages;
+  let lastMessage;
 
   switch (model) {
+    case "reminder-agent":
+      // For reminder agent, we'll process the last message
+      lastMessage = messages[messages.length - 1].content;
+      return {
+        message: lastMessage,
+        isReminderRequest: true,
+      };
+
     case "gpt-4o-mini":
       return {
         model: "gpt-4o-mini",
@@ -178,6 +189,20 @@ export const fetchAIStream = async (
 };
 
 export const fetchAI = async (model, messages, isImage = false) => {
+  if (model === "reminder-agent") {
+    const body = getRequestBody(model, messages, isImage);
+    if (body.isReminderRequest) {
+      const result = await reminderAgent.processReminderRequest(body.message);
+
+      // Check if this is a reminder notification
+      if (result.isReminderNotification) {
+        return result.message;
+      }
+
+      return result.message;
+    }
+  }
+
   if (model === "image-gen") {
     const encodedPrompt = encodeURIComponent(
       messages[messages.length - 1].content

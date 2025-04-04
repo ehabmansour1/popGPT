@@ -7,6 +7,7 @@ const ChatSidebar = ({
   onLoadChat,
   onDeleteChat,
   onRenameChat,
+  currentChatId,
 }) => {
   const [editingChatId, setEditingChatId] = useState(null);
   const [newChatName, setNewChatName] = useState("");
@@ -86,7 +87,12 @@ const ChatSidebar = ({
       </button>
       <div className="chat-history">
         {sortedChats.map((chat) => (
-          <div key={chat.id} className="chat-history-item">
+          <div
+            key={chat.id}
+            className={`chat-history-item ${
+              chat.id === currentChatId ? "active" : ""
+            }`}
+          >
             <div
               className="chat-item-content"
               onClick={() => onLoadChat(chat.id)}
@@ -187,7 +193,13 @@ const ChatSidebar = ({
           transition: all 0.2s;
         }
 
-        .chat-history-item:hover {
+        .chat-history-item:hover,
+        .chat-history-item.active {
+          background: var(--hover-bg);
+          border-color: var(--main-color);
+        }
+
+        .chat-history-item.active {
           background: var(--hover-bg);
           border-color: var(--main-color);
         }

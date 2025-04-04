@@ -29,21 +29,28 @@ const InputContainer = ({ onSendMessage, selectedModel }) => {
     }
   };
 
+  const getPlaceholder = () => {
+    switch (selectedModel) {
+      case "image-gen":
+        return "Describe the image you want to generate...";
+      case "reminder-agent":
+        return "Type your reminder request (e.g., 'Please remind me to call mom tomorrow at 2pm')...";
+      default:
+        return "Type your message here...";
+    }
+  };
+
   return (
     <div className="input-container">
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={
-          selectedModel === "image-gen"
-            ? "Describe the image you want to generate..."
-            : "Type your message here..."
-        }
+        placeholder={getPlaceholder()}
         rows="1"
         maxLength="4000"
       />
-      {selectedModel !== "image-gen" && (
+      {selectedModel !== "image-gen" && selectedModel !== "reminder-agent" && (
         <>
           <input
             type="file"

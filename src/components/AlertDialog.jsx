@@ -30,6 +30,7 @@ const AlertDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
           justify-content: center;
           z-index: 1000;
           animation: fadeIn 0.2s ease-out;
+          backdrop-filter: blur(15px);
         }
 
         .alert-dialog {
