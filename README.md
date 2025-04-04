@@ -22,6 +22,18 @@ To obtain these API keys:
 
 PopGPT is a modern web application built with React and Vite that allows users to interact with multiple AI models through a unified interface. The application provides a seamless experience for users to communicate with different AI models and compare their responses.
 
+## ⏰ Reminder Agent Feature
+
+The application includes a smart reminder agent that can help users manage their tasks and schedule reminders. The agent can:
+
+- Set reminders for specific tasks or events
+- Schedule recurring reminders
+- Send notifications through the chat interface
+- Handle natural language input for setting reminders
+- Integrate with the existing chat system for seamless interaction
+
+The reminder agent uses the chat interface to communicate with users, making it feel like a natural part of the conversation. When a reminder is due, it appears as a message in the chat, maintaining the context of the conversation.
+
 ## 🛠️ Tech Stack
 
 - **Frontend Framework**: React
